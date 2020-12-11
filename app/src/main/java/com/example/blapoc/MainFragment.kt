@@ -18,13 +18,6 @@ import java.util.*
 class MainFragment : Fragment() {
     var mActivity: MainActivity? = null
 
-
-    // Handles various events fired by the Service.
-    // ACTION_GATT_CONNECTED: connected to a GATT server.
-    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
-    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
-    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read
-    //                        or notification operations.
     val mGattUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
@@ -58,9 +51,9 @@ class MainFragment : Fragment() {
         private fun log(uuid: String?, hexValue: String?, stringValue: String?, title: String) {
             Log.d("ACTION_DATA_AVAILABLE", title)
             Log.d("ACTION_DATA_AVAILABLE", AllGattServices().lookup(UUID.fromString(uuid)))
-            Log.d("ACTION_DATA_AVAILABLE", uuid)
-            Log.d("ACTION_DATA_AVAILABLE", hexValue)
-            Log.d("ACTION_DATA_AVAILABLE", stringValue)
+            Log.d("ACTION_DATA_AVAILABLE", uuid ?:"")
+            Log.d("ACTION_DATA_AVAILABLE", hexValue?:"")
+            Log.d("ACTION_DATA_AVAILABLE", stringValue?:"")
             Log.d("ACTION_DATA_AVAILABLE", "----------------------------")
         }
     }
@@ -122,6 +115,5 @@ class MainFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         mActivity?.unregisterReceiver(mGattUpdateReceiver);
-
     }
 }
