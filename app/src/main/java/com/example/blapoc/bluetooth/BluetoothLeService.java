@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.blapoc;
+package com.example.blapoc.bluetooth;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;

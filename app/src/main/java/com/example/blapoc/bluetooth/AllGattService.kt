@@ -1,4 +1,4 @@
-package com.example.blapoc
+package com.example.blapoc.bluetooth
 
 import java.util.*
 import kotlin.collections.HashMap

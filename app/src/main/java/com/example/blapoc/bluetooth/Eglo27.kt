@@ -1,4 +1,4 @@
-package com.example.blapoc
+package com.example.blapoc.bluetooth
 
 class Eglo27 {
     companion object {

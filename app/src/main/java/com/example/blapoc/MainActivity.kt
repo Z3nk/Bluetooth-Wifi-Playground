@@ -1,6 +1,5 @@
 package com.example.blapoc
 
-import android.bluetooth.BluetoothManager
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
@@ -10,6 +9,8 @@ import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.blapoc.bluetooth.BluetoothLeService
+import com.example.blapoc.wifi.WifiFragment
 
 class MainActivity : AppCompatActivity() {
     var mBluetoothLeService: BluetoothLeService? = null

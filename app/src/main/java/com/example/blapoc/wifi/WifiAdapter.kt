@@ -1,9 +1,10 @@
-package com.example.blapoc
+package com.example.blapoc.wifi
 
 import android.net.wifi.ScanResult
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.blapoc.R
 
 class WifiAdapter(private var data: List<ScanResult>,
                   val onClick: (video: ScanResult) -> Unit

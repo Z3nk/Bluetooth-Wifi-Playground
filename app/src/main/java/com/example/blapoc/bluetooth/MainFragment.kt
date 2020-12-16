@@ -1,4 +1,4 @@
-package com.example.blapoc
+package com.example.blapoc.bluetooth
 
 import android.bluetooth.BluetoothGattService
 import android.content.BroadcastReceiver
@@ -12,6 +12,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.blapoc.MainActivity
+import com.example.blapoc.R
 import kotlinx.android.synthetic.main.fragment_main.*
 import java.util.*
 

@@ -1,4 +1,4 @@
-package com.example.blapoc;
+package com.example.blapoc.wifi;
 
 
 import android.content.BroadcastReceiver;

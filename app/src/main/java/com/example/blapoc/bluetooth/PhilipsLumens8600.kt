@@ -1,4 +1,4 @@
-package com.example.blapoc
+package com.example.blapoc.bluetooth
 
 class PhilipsLumens8600 {
     companion object {
