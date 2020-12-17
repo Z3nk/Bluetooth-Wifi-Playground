@@ -9,8 +9,8 @@ import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.blapoc.bluetooth.BluetoothLeService
-import com.example.blapoc.wifi.WifiFragment
+import com.example.blapoc.accelero.AcceleroFragment
+import com.example.blapoc.bluetooth.MainFragment
 
 class MainActivity : AppCompatActivity() {
     var mBluetoothLeService: BluetoothLeService? = null
@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initBluetooth()
-        supportFragmentManager.beginTransaction().replace(R.id.container, WifiFragment()).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.container, AcceleroFragment()).commit()
     }
 
     private fun initBluetooth() {
