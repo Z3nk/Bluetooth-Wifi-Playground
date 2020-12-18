@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initBluetooth()
-        supportFragmentManager.beginTransaction().replace(R.id.container, AcceleroFragment()).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.container, MainFragment()).commit()
     }
 
     private fun initBluetooth() {

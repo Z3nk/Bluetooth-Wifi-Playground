@@ -114,6 +114,13 @@ public class BluetoothLeService extends Service {
         }
 
         @Override
+        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                onCharacteristicUpdated(CHARACTERISTIC_CHANGED, characteristic);
+            }
+        }
+
+        @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
             onCharacteristicUpdated(CHARACTERISTIC_CHANGED, characteristic);
@@ -123,7 +130,7 @@ public class BluetoothLeService extends Service {
         public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 onDescriptorUpdated(descriptor);
-            }else{
+            } else {
                 Log.d("onDescriptorRead", "couldn't read descriptor of " + descriptor.getUuid());
             }
         }
@@ -281,12 +288,31 @@ public class BluetoothLeService extends Service {
      * @param characteristic The characteristic to read from.
      */
     public void readCharacteristic(BluetoothGattCharacteristic characteristic) {
-        Log.d(BluetoothLeService.class.getSimpleName(), "readCharacteristic of " + characteristic.getUuid());
+        Log.d(BluetoothLeService.class.getSimpleName(), "" +
+                "readCharacteristic of " + characteristic.getUuid());
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
             return;
         }
         mBluetoothGatt.readCharacteristic(characteristic);
+    }
+
+    public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
+        final byte[] data = characteristic.getValue();
+        if (data != null && data.length > 0) {
+            final StringBuilder stringBuilder = new StringBuilder(data.length);
+            for (byte byteChar : data) {
+                stringBuilder.append(String.format("%02X ", byteChar));
+            }
+            Log.d(BluetoothLeService.class.getSimpleName(), "writeCharacteristic of " + characteristic.getUuid() + " with " + stringBuilder.toString());
+            if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+                Log.w(TAG, "BluetoothAdapter not initialized");
+                return;
+            }
+            mBluetoothGatt.writeCharacteristic(characteristic);
+        }else{
+            Log.w(TAG, "Maybe bad value ?");
+        }
     }
 
     public void readDescriptor(BluetoothGattDescriptor descriptor) {

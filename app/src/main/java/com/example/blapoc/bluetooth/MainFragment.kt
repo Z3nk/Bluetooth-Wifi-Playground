@@ -1,5 +1,6 @@
 package com.example.blapoc.bluetooth
 
+import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -20,7 +21,7 @@ import java.util.*
 
 class MainFragment : Fragment() {
     var mActivity: MainActivity? = null
-
+    var writeChara: BluetoothGattCharacteristic? = null
     val mGattUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
@@ -35,18 +36,24 @@ class MainFragment : Fragment() {
                 displayGattServices(mActivity?.mBluetoothLeService?.supportedGattServices)
             } else if (BluetoothLeService.CHARACTERISTIC_READ == action) {
                 val uuid = intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_UUID)
-                val hexValue = intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_VALUE_HEX)
-                val stringValue = intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_VALUE_STRING)
+                val hexValue =
+                    intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_VALUE_HEX)
+                val stringValue =
+                    intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_VALUE_STRING)
                 log(uuid, hexValue, stringValue, "-- ON CHARACTERISTIC_READ --")
             } else if (BluetoothLeService.CHARACTERISTIC_CHANGED == action) {
                 val uuid = intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_UUID)
-                val hexValue = intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_VALUE_HEX)
-                val stringValue = intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_VALUE_STRING)
+                val hexValue =
+                    intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_VALUE_HEX)
+                val stringValue =
+                    intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_VALUE_STRING)
                 log(uuid, hexValue, stringValue, "-- ON CHARACTERISTIC_CHANGED --")
             } else if (BluetoothLeService.DESCRIPTOR_READ == action) {
                 val uuid = intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_UUID)
-                val hexValue = intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_VALUE_HEX)
-                val stringValue = intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_VALUE_STRING)
+                val hexValue =
+                    intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_VALUE_HEX)
+                val stringValue =
+                    intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_VALUE_STRING)
                 log(uuid, hexValue, stringValue, "-- ON DESCRIPTOR_READ --")
             }
         }
@@ -54,9 +61,9 @@ class MainFragment : Fragment() {
         private fun log(uuid: String?, hexValue: String?, stringValue: String?, title: String) {
             Log.d("ACTION_DATA_AVAILABLE", title)
             Log.d("ACTION_DATA_AVAILABLE", AllGattServices().lookup(UUID.fromString(uuid)))
-            Log.d("ACTION_DATA_AVAILABLE", uuid ?:"")
-            Log.d("ACTION_DATA_AVAILABLE", hexValue?:"")
-            Log.d("ACTION_DATA_AVAILABLE", stringValue?:"")
+            Log.d("ACTION_DATA_AVAILABLE", uuid ?: "")
+            Log.d("ACTION_DATA_AVAILABLE", hexValue ?: "")
+            Log.d("ACTION_DATA_AVAILABLE", stringValue ?: "")
             Log.d("ACTION_DATA_AVAILABLE", "----------------------------")
         }
     }
@@ -72,12 +79,16 @@ class MainFragment : Fragment() {
                         tv_information.text = (tv_information.text.toString() + "\n $name")
                     }
                     for (characteristic in currentService.characteristics) {
-                        mActivity?.mBluetoothLeService?.readCharacteristic(characteristic)
-                        Thread.sleep(1000)
+                        //mActivity?.mBluetoothLeService?.readCharacteristic(characteristic)
+                        //Thread.sleep(1000)
+                        if (characteristic.uuid.toString().contains("a101", true)) {
+                            writeChara = characteristic
+                            Log.d("displayGattServices", "bingo")
+                        }
 
-                        for(descruptor in characteristic.descriptors){
-                            mActivity?.mBluetoothLeService?.readDescriptor(descruptor)
-                            Thread.sleep(1000)
+                        for (descruptor in characteristic.descriptors) {
+                            //mActivity?.mBluetoothLeService?.readDescriptor(descruptor)
+                            //Thread.sleep(1000)
                         }
                     }
                 }
@@ -86,9 +97,9 @@ class MainFragment : Fragment() {
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         mActivity = activity as MainActivity
         return inflater.inflate(R.layout.fragment_main, container, false);
@@ -99,7 +110,23 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         bt_pair.setOnClickListener {
-            mActivity?.mBluetoothLeService?.connect(Eglo27.address)
+            mActivity?.mBluetoothLeService?.connect(BulbBle.address)
+        }
+
+        bt_off.setOnClickListener {
+            //val char: BluetoothGattCharacteristic? = BluetoothGattCharacteristic()
+            writeChara?.value =
+                BinaryTools().decodeHexString("0000100103000001")// byteArrayOf(0x0, 0x0, 0x0, 0x0, 0xF, 0x0, 0x0, 0x1, 0x3, 0x0, 0x0, 0x1)
+            mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
+
+        }
+        bt_on.setOnClickListener {
+            writeChara?.value = BinaryTools().decodeHexString("0000100103010001")
+            mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
+        }
+        bt_custom.setOnClickListener {
+            writeChara?.value = BinaryTools().decodeHexString("0000110103FF0001")
+            mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
         }
     }
 
