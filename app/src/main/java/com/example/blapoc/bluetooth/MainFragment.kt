@@ -125,9 +125,66 @@ class MainFragment : Fragment() {
             mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
         }
         bt_custom.setOnClickListener {
-            writeChara?.value = BinaryTools().decodeHexString("0000110103FF0001")
+            writeChara?.value = BinaryTools().decodeHexString(getHueSaturationRose())
             mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
         }
+    }
+
+    private fun getRandomColor(): String {
+        val random = Random()
+        val i1 = random.nextInt(6400 - 1500) + 1500
+        val i2 = random.nextInt(6400 - 1500) + 1500
+        val s = "0000130A06" + i1 + i2 + "0101"
+        return s;
+    }
+
+    private fun getWhiteColor(): String {
+        val random = Random()
+        val i1 = "500D"
+        val i2 = "543F"
+        val s = "0000130A06" + i1 + i2 + "0101" // 0000130A06500D543F0101
+        return s;
+    }
+
+    private fun getRedColor(): String {
+        val random = Random()
+        val i1 = "A3D7"
+        val i2 = "547A"
+        val s = "0000130A06" + i1 + i2 + "0101" // 0000130A06A3D7547A0101
+        return s;
+    }
+
+    private fun getGreenColor(): String {
+        val random = Random()
+        val i1 = "4CCC"//"3000"
+        val i2 = "9999"//"6000"
+        val s = "0000130A06" + i1 + i2 + "0101" // 0000130A064CCC99990101
+        return s;
+    }
+
+    private fun getBlueColor(): String {
+        val random = Random()
+        val i1 = "2666"
+        val i2 = "0F5C"
+        val s = "0000130A06" + i1 + i2 + "3310" // 0000130A0626660F5C0101
+        return s;
+    }
+
+    private fun getHueSaturationRose(): String {
+        // hue : 0.8528957962989807
+        // sat : 0.838387668132782
+        val random = Random()
+        val tidep = "0000"
+        val opcode = "1307" // hue and saturation payload
+        val length = "04" // nombre de bytes du payload
+        //payload
+        val hue1 = "DA"
+        val sat1 = "D6"
+        val transition = "01"
+        val delay = "01"
+        val s =
+            tidep + opcode + length + hue1 + sat1 + transition + delay // 0000130A0626660F5C0101
+        return s;
     }
 
     override fun onResume() {
