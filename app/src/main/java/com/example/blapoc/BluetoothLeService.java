@@ -26,12 +26,18 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.ParcelUuid;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,6 +50,7 @@ public class BluetoothLeService extends Service {
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothLeScanner mBluetoothLeScanner;
     private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
     private int mConnectionState = STATE_DISCONNECTED;
@@ -280,6 +287,26 @@ public class BluetoothLeService extends Service {
         mBluetoothGatt = null;
     }
 
+    public boolean lookFor(final List<String> uuids, final ScanCallback callback) {
+        if (mBluetoothAdapter == null || uuids == null) {
+            Log.w(TAG, "BluetoothAdapter not initialized or unspecified address.");
+            return false;
+        }
+
+        List<ScanFilter> filter = new ArrayList<>();
+        for (String uuid : uuids) {
+            // devices UUID service
+            ParcelUuid parcelUuid = new ParcelUuid(UUID.fromString(uuid));
+            // devices UUID service mask
+            //ParcelUuid parcelUuidMask = new ParcelUuid(UUID.fromString("0000FFFF-0000-0000-0000-000000000000"));
+            ScanFilter scanFilter = new ScanFilter.Builder().setServiceUuid(parcelUuid).build();
+            filter.add(scanFilter);
+        }
+        ScanSettings scanSettings = new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build();
+        mBluetoothAdapter.getBluetoothLeScanner().startScan(filter, scanSettings, callback);
+        return true;
+    }
+
     /**
      * Request a read on a given {@code BluetoothGattCharacteristic}. The read result is reported
      * asynchronously through the {@code BluetoothGattCallback#onCharacteristicRead(android.bluetooth.BluetoothGatt, android.bluetooth.BluetoothGattCharacteristic, int)}
@@ -310,7 +337,7 @@ public class BluetoothLeService extends Service {
                 return;
             }
             mBluetoothGatt.writeCharacteristic(characteristic);
-        }else{
+        } else {
             Log.w(TAG, "Maybe bad value ?");
         }
     }

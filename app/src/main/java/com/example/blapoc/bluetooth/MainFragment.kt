@@ -2,6 +2,8 @@ package com.example.blapoc.bluetooth
 
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanResult
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -87,8 +89,8 @@ class MainFragment : Fragment() {
                         }
 
                         for (descruptor in characteristic.descriptors) {
-                            //mActivity?.mBluetoothLeService?.readDescriptor(descruptor)
-                            //Thread.sleep(1000)
+                           // mActivity?.mBluetoothLeService?.readDescriptor(descruptor)
+                           // Thread.sleep(1000)
                         }
                     }
                 }
@@ -110,24 +112,65 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         bt_pair.setOnClickListener {
+            //getReadyLexmanBulbs()
             mActivity?.mBluetoothLeService?.connect(BulbBle.address)
         }
 
         bt_off.setOnClickListener {
             //val char: BluetoothGattCharacteristic? = BluetoothGattCharacteristic()
             writeChara?.value =
-                BinaryTools().decodeHexString("0000100103000001")// byteArrayOf(0x0, 0x0, 0x0, 0x0, 0xF, 0x0, 0x0, 0x1, 0x3, 0x0, 0x0, 0x1)
+                BinaryTools().decodeHexString(getOffHex())// byteArrayOf(0x0, 0x0, 0x0, 0x0, 0xF, 0x0, 0x0, 0x1, 0x3, 0x0, 0x0, 0x1)
             mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
 
         }
         bt_on.setOnClickListener {
-            writeChara?.value = BinaryTools().decodeHexString("0000100103010001")
+            writeChara?.value = BinaryTools().decodeHexString(getOnHex())
             mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
         }
         bt_custom.setOnClickListener {
-            writeChara?.value = BinaryTools().decodeHexString(getHueSaturationRose())
+            // writeChara?.value = BinaryTools().decodeHexString(getHueSaturationRose())
+            writeChara?.value = BinaryTools().decodeHexString(getLowColorTemperature())
             mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
         }
+    }
+
+    private fun getLowColorTemperature(): String? {
+        val tidep = "0000"
+        val opcode = "1201" // hue and saturation payload
+        val length = "04" // nombre de bytes du payload
+        //payload
+        val color1 = "4E"
+        val color2 = "20"
+        val transition = "01"
+        val delay = "01"
+        val s =
+            tidep + opcode + length + color1 + color2 + transition + delay // 0000130A0626660F5C0101
+        return s;
+    }
+
+    private fun getOnHex() = "0000100103010001"
+
+    private fun getOffHex() = "0000100103000001"
+
+    private fun getReadyLexmanBulbs() {
+        mActivity?.mBluetoothLeService?.lookFor(
+            listOf("0000a100-0000-1000-8000-00805f9b34fb"),
+            //listOf("0000a1000-1115-1000-0001-617573746f6d"),
+            // listOf("0000a101-1115-1000-0001-617573746f6d"),
+            object : ScanCallback() {
+                override fun onScanResult(callbackType: Int, result: ScanResult?) {
+                    super.onScanResult(callbackType, result)
+                    Log.d("getReadyLexmanBulbs", result.toString());
+                }
+
+                override fun onBatchScanResults(results: MutableList<ScanResult>?) {
+                    super.onBatchScanResults(results)
+                }
+
+                override fun onScanFailed(errorCode: Int) {
+                    super.onScanFailed(errorCode)
+                }
+            })
     }
 
     private fun getRandomColor(): String {
