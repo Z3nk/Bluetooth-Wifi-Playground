@@ -34,8 +34,7 @@ class MainFragment : Fragment() {
                 tv_information.text = "DISconnected"
                 //mConnected = false
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED == action) {
-                // Show all the supported services and characteristics on the user interface.
-                displayGattServices(mActivity?.mBluetoothLeService?.supportedGattServices)
+                onGattServicesDiscovered(mActivity?.mBluetoothLeService?.supportedGattServices)
             } else if (BluetoothLeService.CHARACTERISTIC_READ == action) {
                 val uuid = intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_UUID)
                 val hexValue =
@@ -70,7 +69,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun displayGattServices(supportedGattServices: List<BluetoothGattService>?) {
+    private fun onGattServicesDiscovered(supportedGattServices: List<BluetoothGattService>?) {
         Log.d("MainFragment", "gatt services detected")
         val gateServiceUtilities = AllGattServices()
         supportedGattServices?.let {
@@ -112,8 +111,8 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         bt_pair.setOnClickListener {
-            //getReadyLexmanBulbs()
-            mActivity?.mBluetoothLeService?.connect(BulbBle.address)
+            getReadyLexmanBulbs()
+            //mActivity?.mBluetoothLeService?.connect(BulbBle.address)
         }
 
         bt_off.setOnClickListener {
@@ -121,7 +120,6 @@ class MainFragment : Fragment() {
             writeChara?.value =
                 BinaryTools().decodeHexString(getOffHex())// byteArrayOf(0x0, 0x0, 0x0, 0x0, 0xF, 0x0, 0x0, 0x1, 0x3, 0x0, 0x0, 0x1)
             mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
-
         }
         bt_on.setOnClickListener {
             writeChara?.value = BinaryTools().decodeHexString(getOnHex())
@@ -139,12 +137,12 @@ class MainFragment : Fragment() {
         val opcode = "1201" // hue and saturation payload
         val length = "04" // nombre de bytes du payload
         //payload
-        val color1 = "4E"
-        val color2 = "20"
+        val color1 = "00"
+        val color2 = "99"
         val transition = "01"
         val delay = "01"
         val s =
-            tidep + opcode + length + color1 + color2 + transition + delay // 0000130A0626660F5C0101
+            tidep + opcode + length + color1 + color2 + transition + delay //
         return s;
     }
 
@@ -160,6 +158,7 @@ class MainFragment : Fragment() {
             object : ScanCallback() {
                 override fun onScanResult(callbackType: Int, result: ScanResult?) {
                     super.onScanResult(callbackType, result)
+                    mActivity?.mBluetoothLeService?.connect(result?.device?.address)
                     Log.d("getReadyLexmanBulbs", result.toString());
                 }
 
