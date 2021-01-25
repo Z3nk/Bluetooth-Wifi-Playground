@@ -5,6 +5,7 @@ import kotlin.collections.HashMap
 
 
 class AllGattServices {
+
     private val attributes: HashMap<String, String> = HashMap()
     var HEART_RATE_MEASUREMENT = "00002a37-0000-1000-8000-00805f9b34fb"
     fun lookup(uuid: UUID): String {
@@ -68,5 +69,10 @@ class AllGattServices {
         attributes["00002a04-0000-1000-8000-00805f9b34fb"] = "Manufacturer Name String"
         attributes["00002a05-0000-1000-8000-00805f9b34fb"] = "Service Changed"
         attributes["00002A06-0000-1000-8000-00805f9b34fb"] = "Alert level"
+    }
+
+    companion object {
+        @kotlin.jvm.JvmField
+        var CLIENT_CHARACTERISTIC_CONFIG: String = "00002902-0000-1000-8000-00805f9b34fb";
     }
 }

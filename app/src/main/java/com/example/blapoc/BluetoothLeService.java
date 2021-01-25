@@ -37,6 +37,8 @@ import android.os.IBinder;
 import android.os.ParcelUuid;
 import android.util.Log;
 
+import com.example.blapoc.bluetooth.AllGattServices;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -46,6 +48,7 @@ import java.util.UUID;
  * given Bluetooth LE device.
  */
 public class BluetoothLeService extends Service {
+
     private final static String TAG = BluetoothLeService.class.getSimpleName();
 
     private BluetoothManager mBluetoothManager;
@@ -82,8 +85,46 @@ public class BluetoothLeService extends Service {
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
+
+        @Override
+        public void onPhyUpdate(BluetoothGatt gatt, int txPhy, int rxPhy, int status) {
+            super.onPhyUpdate(gatt, txPhy, rxPhy, status);
+            Log.d("BluetoothLeService","onPhyUpdate");
+        }
+
+        @Override
+        public void onPhyRead(BluetoothGatt gatt, int txPhy, int rxPhy, int status) {
+            super.onPhyRead(gatt, txPhy, rxPhy, status);
+            Log.d("BluetoothLeService","onPhyUpdate");
+        }
+
+        @Override
+        public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+            super.onDescriptorWrite(gatt, descriptor, status);
+            Log.d("BluetoothLeService","onPhyUpdate");
+        }
+
+        @Override
+        public void onReliableWriteCompleted(BluetoothGatt gatt, int status) {
+            super.onReliableWriteCompleted(gatt, status);
+            Log.d("BluetoothLeService","onPhyUpdate");
+        }
+
+        @Override
+        public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
+            super.onReadRemoteRssi(gatt, rssi, status);
+            Log.d("BluetoothLeService","onPhyUpdate");
+        }
+
+        @Override
+        public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
+            super.onMtuChanged(gatt, mtu, status);
+            Log.d("BluetoothLeService","onPhyUpdate");
+        }
+
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            Log.d("BluetoothLeService","onConnectionStateChange");
             String intentAction;
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 intentAction = ACTION_GATT_CONNECTED;
@@ -104,6 +145,7 @@ public class BluetoothLeService extends Service {
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            Log.d("BluetoothLeService","onServicesDiscovered");
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
             } else {
@@ -115,6 +157,7 @@ public class BluetoothLeService extends Service {
         public void onCharacteristicRead(BluetoothGatt gatt,
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
+            Log.d("BluetoothLeService","onCharacteristicRead");
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 onCharacteristicUpdated(CHARACTERISTIC_READ, characteristic);
             }
@@ -122,6 +165,7 @@ public class BluetoothLeService extends Service {
 
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            Log.d("BluetoothLeService","onCharacteristicWrite");
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 onCharacteristicUpdated(CHARACTERISTIC_CHANGED, characteristic);
             }
@@ -130,11 +174,13 @@ public class BluetoothLeService extends Service {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
+            Log.d("BluetoothLeService","onCharacteristicChanged");
             onCharacteristicUpdated(CHARACTERISTIC_CHANGED, characteristic);
         }
 
         @Override
         public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+            Log.d("BluetoothLeService","onDescriptorRead");
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 onDescriptorUpdated(descriptor);
             } else {
@@ -367,11 +413,11 @@ public class BluetoothLeService extends Service {
 
         // This is specific to Heart Rate Measurement.
 //        if (UUID_HEART_RATE_MEASUREMENT.equals(characteristic.getUuid())) {
-//            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
-//                    UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG));
-//            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-//            mBluetoothGatt.writeDescriptor(descriptor);
-//        }
+            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
+                    UUID.fromString(AllGattServices.CLIENT_CHARACTERISTIC_CONFIG));
+            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+            mBluetoothGatt.writeDescriptor(descriptor);
+//       }
     }
 
     /**

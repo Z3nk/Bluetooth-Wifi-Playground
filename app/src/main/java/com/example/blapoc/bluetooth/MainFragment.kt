@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.AsyncTask
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +25,7 @@ import java.util.*
 class MainFragment : Fragment() {
     var mActivity: MainActivity? = null
     var writeChara: BluetoothGattCharacteristic? = null
+    var readChara: BluetoothGattCharacteristic? = null
     val mGattUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
@@ -84,12 +86,17 @@ class MainFragment : Fragment() {
                         //Thread.sleep(1000)
                         if (characteristic.uuid.toString().contains("a101", true)) {
                             writeChara = characteristic
-                            Log.d("displayGattServices", "bingo")
+                            Log.d("displayGattServices", "write characteristic found")
+                        }
+                        if (characteristic.uuid.toString().contains("a102", true)) {
+                            mActivity?.mBluetoothLeService?.setCharacteristicNotification(characteristic, true)
+                            readChara = characteristic
+                            Log.d("displayGattServices", "read characteristic found")
                         }
 
                         for (descruptor in characteristic.descriptors) {
-                           // mActivity?.mBluetoothLeService?.readDescriptor(descruptor)
-                           // Thread.sleep(1000)
+                            // mActivity?.mBluetoothLeService?.readDescriptor(descruptor)
+                            // Thread.sleep(1000)
                         }
                     }
                 }
@@ -111,8 +118,9 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         bt_pair.setOnClickListener {
-            getReadyLexmanBulbs()
-            //mActivity?.mBluetoothLeService?.connect(BulbBle.address)
+//            getReadyLexmanBulbs()
+            mActivity?.mBluetoothLeService?.connect("84:2E:14:A1:B3:E8")
+            //mActivity?.mBluetoothLeService?.connect("84:2E:14:A1:AA:23")
         }
 
         bt_off.setOnClickListener {
@@ -124,27 +132,65 @@ class MainFragment : Fragment() {
         bt_on.setOnClickListener {
             writeChara?.value = BinaryTools().decodeHexString(getOnHex())
             mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
+            // getPoliceBlink(false)
         }
         bt_custom.setOnClickListener {
             // writeChara?.value = BinaryTools().decodeHexString(getHueSaturationRose())
-            writeChara?.value = BinaryTools().decodeHexString(getLowColorTemperature())
+//            writeChara?.value = BinaryTools().decodeHexString(getLowColorTemperature())
+//            writeChara?.value = BinaryTools().decodeHexString(getIdentifyBlinkBlink())
+//            mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
+
+            // getPoliceBlink(true)
+
+
+            // GET VALEUR OF ON/OFF BULB
+//            readChara?.value = BinaryTools().decodeHexString("00001002")
+//            writeChara?.value = BinaryTools().decodeHexString("00001001")
+//            mActivity?.mBluetoothLeService?.readCharacteristic(writeChara)
+//            readChara?.value = BinaryTools().decodeHexString("00001001")
+//            mActivity?.mBluetoothLeService?.readCharacteristic(readChara)
+//
+//            readChara?.value = BinaryTools().decodeHexString("00001002")
+//            mActivity?.mBluetoothLeService?.readCharacteristic(readChara)
+//            writeChara?.value = BinaryTools().decodeHexString("00001002")
+//            mActivity?.mBluetoothLeService?.readCharacteristic(writeChara)
+//
+//            readChara?.value = BinaryTools().decodeHexString("00001003")
+//            mActivity?.mBluetoothLeService?.readCharacteristic(readChara)
+            writeChara?.value = BinaryTools().decodeHexString("00001002")
             mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
         }
     }
 
-    private fun getLowColorTemperature(): String? {
+    private fun getPoliceBlink(isBlue: Boolean) {
         val tidep = "0000"
-        val opcode = "1201" // hue and saturation payload
+        val opcode = "1307" // hue and saturation payload
         val length = "04" // nombre de bytes du payload
         //payload
-        val color1 = "00"
-        val color2 = "99"
-        val transition = "01"
-        val delay = "01"
-        val s =
-            tidep + opcode + length + color1 + color2 + transition + delay //
-        return s;
+        val transition = "64" // 01000001
+        val delay = "00"
+
+        if (isBlue) {
+            val hue1 = "AE"  // 0.6814447045326233 = 236/360
+            val sat1 = "FF"
+            writeChara?.value =
+                BinaryTools().decodeHexString(tidep + opcode + length + hue1 + sat1 + transition + delay)
+        } else {
+            val hue1 = "00"
+            val sat1 = "FF"
+            writeChara?.value =
+                BinaryTools().decodeHexString(tidep + opcode + length + hue1 + sat1 + transition + delay)
+        }
+
+        mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
+
+
+//        val h = Handler()
+//        h.postDelayed({ getPoliceBlink(!isBlue) }, 1000)
     }
+
+    private fun getIdentifyBlinkBlink() = "0000200102FFFF"
+
 
     private fun getOnHex() = "0000100103010001"
 
@@ -158,16 +204,18 @@ class MainFragment : Fragment() {
             object : ScanCallback() {
                 override fun onScanResult(callbackType: Int, result: ScanResult?) {
                     super.onScanResult(callbackType, result)
-                    mActivity?.mBluetoothLeService?.connect(result?.device?.address)
                     Log.d("getReadyLexmanBulbs", result.toString());
+                    mActivity?.mBluetoothLeService?.connect(result?.device?.address)
                 }
 
                 override fun onBatchScanResults(results: MutableList<ScanResult>?) {
                     super.onBatchScanResults(results)
+                    Log.d("onBatchScanResults", results?.size.toString());
                 }
 
                 override fun onScanFailed(errorCode: Int) {
                     super.onScanFailed(errorCode)
+                    Log.d("onScanFailed", errorCode.toString())
                 }
             })
     }
@@ -226,6 +274,20 @@ class MainFragment : Fragment() {
         val delay = "01"
         val s =
             tidep + opcode + length + hue1 + sat1 + transition + delay // 0000130A0626660F5C0101
+        return s;
+    }
+
+    private fun getLowColorTemperature(): String? {
+        val tidep = "0000"
+        val opcode = "1201" // hue and saturation payload
+        val length = "04" // nombre de bytes du payload
+        //payload
+        val color1 = "00"
+        val color2 = "99"
+        val transition = "01"
+        val delay = "01"
+        val s =
+            tidep + opcode + length + color1 + color2 + transition + delay //
         return s;
     }
 
