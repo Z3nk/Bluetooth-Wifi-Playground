@@ -72,6 +72,8 @@ public class BluetoothLeService extends Service {
             "CHARACTERISTIC_READ";
     public final static String CHARACTERISTIC_CHANGED =
             "CHARACTERISTIC_CHANGED";
+    public final static String CHARACTERISTIC_WRITE =
+            "CHARACTERISTIC_WRITE";
     public final static String DESCRIPTOR_READ =
             "DESCRIPTOR_READ";
 
@@ -157,7 +159,6 @@ public class BluetoothLeService extends Service {
         public void onCharacteristicRead(BluetoothGatt gatt,
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
-            Log.d("BluetoothLeService","onCharacteristicRead");
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 onCharacteristicUpdated(CHARACTERISTIC_READ, characteristic);
             }
@@ -165,22 +166,19 @@ public class BluetoothLeService extends Service {
 
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            Log.d("BluetoothLeService","onCharacteristicWrite");
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                onCharacteristicUpdated(CHARACTERISTIC_CHANGED, characteristic);
+                onCharacteristicUpdated(CHARACTERISTIC_WRITE, characteristic);
             }
         }
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
-            Log.d("BluetoothLeService","onCharacteristicChanged");
             onCharacteristicUpdated(CHARACTERISTIC_CHANGED, characteristic);
         }
 
         @Override
         public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
-            Log.d("BluetoothLeService","onDescriptorRead");
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 onDescriptorUpdated(descriptor);
             } else {

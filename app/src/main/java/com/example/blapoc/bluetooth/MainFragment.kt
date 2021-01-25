@@ -51,6 +51,13 @@ class MainFragment : Fragment() {
                 val stringValue =
                     intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_VALUE_STRING)
                 log(uuid, hexValue, stringValue, "-- ON CHARACTERISTIC_CHANGED --")
+            }else if (BluetoothLeService.CHARACTERISTIC_WRITE == action) {
+                val uuid = intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_UUID)
+                val hexValue =
+                    intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_VALUE_HEX)
+                val stringValue =
+                    intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_VALUE_STRING)
+                log(uuid, hexValue, stringValue, "-- ON CHARACTERISTIC_WRITE --")
             } else if (BluetoothLeService.DESCRIPTOR_READ == action) {
                 val uuid = intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_UUID)
                 val hexValue =
@@ -299,6 +306,7 @@ class MainFragment : Fragment() {
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED)
         intentFilter.addAction(BluetoothLeService.CHARACTERISTIC_READ)
         intentFilter.addAction(BluetoothLeService.CHARACTERISTIC_CHANGED)
+        intentFilter.addAction(BluetoothLeService.CHARACTERISTIC_WRITE)
         intentFilter.addAction(BluetoothLeService.DESCRIPTOR_READ)
         mActivity?.registerReceiver(mGattUpdateReceiver, intentFilter)
     }
