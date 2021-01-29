@@ -414,7 +414,7 @@ public class BluetoothLeService extends Service {
             BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
                     UUID.fromString(AllGattServices.CLIENT_CHARACTERISTIC_CONFIG));
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-            mBluetoothGatt.writeDescriptor(descriptor);
+            mBluetoothGatt.writeDescriptor(descriptor); // 00002902-0000-1000-8000-00805f9b34fb --> 0100
 //       }
     }
 

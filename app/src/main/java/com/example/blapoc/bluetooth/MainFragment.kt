@@ -51,7 +51,7 @@ class MainFragment : Fragment() {
                 val stringValue =
                     intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_VALUE_STRING)
                 log(uuid, hexValue, stringValue, "-- ON CHARACTERISTIC_CHANGED --")
-            }else if (BluetoothLeService.CHARACTERISTIC_WRITE == action) {
+            } else if (BluetoothLeService.CHARACTERISTIC_WRITE == action) {
                 val uuid = intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_UUID)
                 val hexValue =
                     intent.getStringExtra(BluetoothLeService.EXTRA_CHARACTERISTIC_VALUE_HEX)
@@ -96,7 +96,10 @@ class MainFragment : Fragment() {
                             Log.d("displayGattServices", "write characteristic found")
                         }
                         if (characteristic.uuid.toString().contains("a102", true)) {
-                            mActivity?.mBluetoothLeService?.setCharacteristicNotification(characteristic, true)
+                            mActivity?.mBluetoothLeService?.setCharacteristicNotification(
+                                characteristic,
+                                true
+                            )
                             readChara = characteristic
                             Log.d("displayGattServices", "read characteristic found")
                         }
@@ -142,7 +145,8 @@ class MainFragment : Fragment() {
             // getPoliceBlink(false)
         }
         bt_custom.setOnClickListener {
-            // writeChara?.value = BinaryTools().decodeHexString(getHueSaturationRose())
+            //writeChara?.value = BinaryTools().decodeHexString(getBlueColor())
+//             writeChara?.value = BinaryTools().decodeHexString(getHueSaturationRose())
 //            writeChara?.value = BinaryTools().decodeHexString(getLowColorTemperature())
 //            writeChara?.value = BinaryTools().decodeHexString(getIdentifyBlinkBlink())
 //            mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
@@ -162,9 +166,21 @@ class MainFragment : Fragment() {
 //            writeChara?.value = BinaryTools().decodeHexString("00001002")
 //            mActivity?.mBluetoothLeService?.readCharacteristic(writeChara)
 //
+//            GET ON OFF
 //            readChara?.value = BinaryTools().decodeHexString("00001003")
 //            mActivity?.mBluetoothLeService?.readCharacteristic(readChara)
-            writeChara?.value = BinaryTools().decodeHexString("00001002")
+
+            // GET COLORS
+            // writeChara?.value = BinaryTools().decodeHexString("00001308")
+
+            // GET MIRED
+            //writeChara?.value = BinaryTools().decodeHexString("00001002")
+
+            // 100% 40s
+            //writeChara?.value = BinaryTools().decodeHexString("0000110103FF6801")
+
+            // CHANGE COLOR TEMPERATURE
+            writeChara?.value = BinaryTools().decodeHexString("000012010400996801")
             mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
         }
     }
@@ -199,9 +215,9 @@ class MainFragment : Fragment() {
     private fun getIdentifyBlinkBlink() = "0000200102FFFF"
 
 
-    private fun getOnHex() = "0000100103010001"
+    private fun getOnHex() = "0000100103016801"
 
-    private fun getOffHex() = "0000100103000001"
+    private fun getOffHex() = "0000100103006801"
 
     private fun getReadyLexmanBulbs() {
         mActivity?.mBluetoothLeService?.lookFor(
@@ -263,7 +279,7 @@ class MainFragment : Fragment() {
         val random = Random()
         val i1 = "2666"
         val i2 = "0F5C"
-        val s = "0000130A06" + i1 + i2 + "3310" // 0000130A0626660F5C0101
+        val s = "0000130A06" + i1 + i2 + "6801" // 0000130A0626660F5C6801
         return s;
     }
 
@@ -277,10 +293,10 @@ class MainFragment : Fragment() {
         //payload
         val hue1 = "DA"
         val sat1 = "D6"
-        val transition = "01"
+        val transition = "68"
         val delay = "01"
         val s =
-            tidep + opcode + length + hue1 + sat1 + transition + delay // 0000130A0626660F5C0101
+            tidep + opcode + length + hue1 + sat1 + transition + delay // 0000130704DAD66801
         return s;
     }
 
