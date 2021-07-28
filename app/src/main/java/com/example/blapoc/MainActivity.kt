@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.blapoc.accelero.AcceleroFragment
 import com.example.blapoc.bluetooth.MainFragment
+import com.example.blapoc.customviews.CustomViewsFragment
 
 class MainActivity : AppCompatActivity() {
     var mBluetoothLeService: BluetoothLeService? = null
@@ -19,7 +20,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initBluetooth()
-        supportFragmentManager.beginTransaction().replace(R.id.container, MainFragment()).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.container, CustomViewsFragment()).commit()
     }
 
     private fun initBluetooth() {

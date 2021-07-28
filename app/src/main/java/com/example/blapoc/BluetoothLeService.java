@@ -208,7 +208,7 @@ public class BluetoothLeService extends Service {
         if (data != null && data.length > 0) {
             final StringBuilder stringBuilder = new StringBuilder(data.length);
             for (byte byteChar : data) {
-                stringBuilder.append(String.format("%02X ", byteChar));
+                stringBuilder.append(String.format("%02X", byteChar));
             }
             intent.putExtra(EXTRA_CHARACTERISTIC_UUID, uuid.toString());
             intent.putExtra(EXTRA_CHARACTERISTIC_VALUE_HEX, stringBuilder.toString());

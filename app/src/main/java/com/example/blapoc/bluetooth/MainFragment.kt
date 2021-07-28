@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.fragment_main.*
 import java.util.*
 
 class MainFragment : Fragment() {
+    var bitchChara: BluetoothGattCharacteristic? = null
     var mActivity: MainActivity? = null
     var writeChara: BluetoothGattCharacteristic? = null
     var readChara: BluetoothGattCharacteristic? = null
@@ -91,6 +92,9 @@ class MainFragment : Fragment() {
                     for (characteristic in currentService.characteristics) {
                         //mActivity?.mBluetoothLeService?.readCharacteristic(characteristic)
                         //Thread.sleep(1000)
+                        if(characteristic.uuid.toString().contains("2A25", true)){
+                            bitchChara = characteristic
+                        }
                         if (characteristic.uuid.toString().contains("a101", true)) {
                             writeChara = characteristic
                             Log.d("displayGattServices", "write characteristic found")
@@ -128,16 +132,20 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         bt_pair.setOnClickListener {
-//            getReadyLexmanBulbs()
+            //getReadyLexmanBulbs()
+           // mActivity?.mBluetoothLeService?.connect("84:FD:27:5D:CA:25")
             mActivity?.mBluetoothLeService?.connect("84:2E:14:A1:B3:E8")
-            //mActivity?.mBluetoothLeService?.connect("84:2E:14:A1:AA:23")
         }
 
         bt_off.setOnClickListener {
             //val char: BluetoothGattCharacteristic? = BluetoothGattCharacteristic()
-            writeChara?.value =
-                BinaryTools().decodeHexString(getOffHex())// byteArrayOf(0x0, 0x0, 0x0, 0x0, 0xF, 0x0, 0x0, 0x1, 0x3, 0x0, 0x0, 0x1)
+
+            writeChara?.value = BinaryTools().decodeHexString("0000140B")
             mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
+
+//            writeChara?.value =
+//                BinaryTools().decodeHexString(getOffHex())// byteArrayOf(0x0, 0x0, 0x0, 0x0, 0xF, 0x0, 0x0, 0x1, 0x3, 0x0, 0x0, 0x1)
+//            mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
         }
         bt_on.setOnClickListener {
             writeChara?.value = BinaryTools().decodeHexString(getOnHex())
@@ -174,18 +182,44 @@ class MainFragment : Fragment() {
             // writeChara?.value = BinaryTools().decodeHexString("00001308")
 
             // GET MIRED
-            //writeChara?.value = BinaryTools().decodeHexString("00001002")
 
             // 100% 40s
             //writeChara?.value = BinaryTools().decodeHexString("0000110103FF6801")
 
             // CHANGE COLOR TEMPERATURE
-            writeChara?.value = BinaryTools().decodeHexString("000012010400996801")
+//            writeChara?.value = BinaryTools().decodeHexString("000012010400996801")
+
+            // ZIGBEE SET
+//            writeChara?.value = BinaryTools().decodeHexString("000021031D11112222222222222222334444444444444444444444444444444455")
+//            mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
+
+
+            // DELETE ALL SCENE
+//            writeChara?.value = BinaryTools().decodeHexString("0000140B")
+//            mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
+
+            // STORE SCENE 86
+//            writeChara?.value = BinaryTools().decodeHexString("0000140101DD")
+//            mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
+//            writeChara?.value = BinaryTools().decodeHexString("000014010126")
+//            mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
+
+            // READ SCENE LIST
+
+//            writeChara?.value = BinaryTools().decodeHexString("00001405")
+//            mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
+
+            // BLINK
+            writeChara?.value = BinaryTools().decodeHexString("0000200102FFFF0000")
             mActivity?.mBluetoothLeService?.writeCharacteristic(writeChara)
+//            mActivity?.mBluetoothLeService?.readCharacteristic(bitchChara)
         }
     }
 
     private fun getPoliceBlink(isBlue: Boolean) {
+
+//        Un beau bleu foncé serait 240° (H) 100% de sat et V a 100% (toujours a 100% chzez nous)
+//        Un bleu clair violet serait 240° toujours mais avec une sat réduite genre 50° et le V tjrs pareil a 100%
         val tidep = "0000"
         val opcode = "1307" // hue and saturation payload
         val length = "04" // nombre de bytes du payload
@@ -220,8 +254,12 @@ class MainFragment : Fragment() {
     private fun getOffHex() = "0000100103006801"
 
     private fun getReadyLexmanBulbs() {
+        // GOOD UUID
+        // listOf("0000a100-0000-1000-8000-00805f9b34fb"),
         mActivity?.mBluetoothLeService?.lookFor(
             listOf("0000a100-0000-1000-8000-00805f9b34fb"),
+            //listOf("0000a100-0000-0000-0000-000000000000"),
+            //listOf("000aa100-1115-1000-0001-617573746f6d"),
             //listOf("0000a1000-1115-1000-0001-617573746f6d"),
             // listOf("0000a101-1115-1000-0001-617573746f6d"),
             object : ScanCallback() {
